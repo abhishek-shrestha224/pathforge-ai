@@ -288,6 +288,7 @@ parameters = {
 # )
 
 chat = AzureChatOpenAI(azure_deployment="gpt-4o", api_version="2023-03-15-preview")
+
 skillset_chain = (
     skillset_templ
     | chat
