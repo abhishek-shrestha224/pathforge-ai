@@ -19,74 +19,6 @@ example_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-# SkillSet Analysis
-
-skillset_analysis_examples = [
-    {
-        "input": """
-        I recently completed an online course in graphic design, where I learned the basics of Adobe Photoshop, Illustrator, and InDesign. I can create simple logos, posters, and social media graphics, but I’m still getting comfortable with more complex designs. I’m interested in becoming a freelance graphic designer and want to build a portfolio that can attract clients. My goal is to start taking on small projects to gain experience and eventually establish a steady stream of freelance work.
-        """,
-        "output": """
-        Based on your recent completion of an online course in graphic design and your proficiency with Adobe Photoshop, Illustrator, and InDesign, you have developed foundational skills in this field. Your ability to create simple logos, posters, and social media graphics indicates that you have a solid grasp of the basic tools and techniques required for graphic design. However, you are still working on becoming more comfortable with complex designs, which suggests that you are in the early to intermediate stage of your learning journey.
-
-        Your knowledge of Photoshop, Illustrator, and InDesign gives you a versatile skill set to create a wide range of digital and print designs. Photoshop is ideal for photo editing and raster-based designs, Illustrator is your go-to tool for vector-based graphics, and InDesign is used for layout design, especially for print media. Being familiar with these tools equips you to handle diverse projects, though mastering more advanced techniques, such as intricate vector illustrations, advanced photo manipulations, and detailed layout compositions, will be crucial as you progress.
-
-        Your goal of becoming a freelance graphic designer aligns well with your current skill set, especially given your interest in building a portfolio. Taking on small projects is a strategic approach to gaining experience, improving your design skills, and building a client base. As you build your portfolio, focusing on a niche (e.g., branding, social media graphics) could help you stand out to potential clients. Additionally, learning about client management, pricing, and marketing yourself as a freelancer will be essential as you aim to establish a steady stream of work.
-
-        In summary, you have a solid foundation in graphic design with room to grow in terms of handling more complex designs and projects. Your plan to start small and gradually build up your freelance career is well-suited to your current stage.
-        """,
-    },
-    {
-        "input": """
-        I’ve recently started learning Python and have completed a few introductory courses. I’m comfortable with basic concepts like variables, loops, and functions. I’ve also learned how to manipulate data using libraries like Pandas and NumPy, but I’m not sure how to apply these skills to real-world data analysis projects. My goal is to gain more practical experience and eventually work as a data analyst.""",
-        "output": """
-        Your recent introduction to Python and your familiarity with fundamental programming concepts like variables, loops, and functions lay a solid foundation for moving forward in your data analysis journey. The fact that you’ve also explored libraries like Pandas and NumPy suggests you’ve taken steps toward learning tools essential for data manipulation and numerical analysis, which are crucial in the field of data analytics. These libraries allow you to clean, organize, and analyze data, enabling you to perform operations like filtering, aggregating, and transforming datasets.
-
-        However, understanding how to apply these skills to real-world data analysis projects is key to advancing beyond theoretical knowledge. Transitioning from basic exercises to handling actual datasets, drawing insights, and creating meaningful visualizations will help you develop a more practical understanding. Real-world projects often involve working with messy, unstructured data, dealing with missing values, and identifying patterns that can inform decision-making.
-
-        Your goal of becoming a data analyst aligns well with your current trajectory, but gaining more experience with end-to-end projects—starting from data collection and cleaning to performing analysis and presenting results—is crucial. You might consider starting with small, personal projects where you analyze publicly available datasets (e.g., from Kaggle or government databases) to build your portfolio. As you progress, learning more about data visualization (e.g., using Matplotlib or Seaborn) and getting familiar with SQL for database querying will add more depth to your skill set.
-
-        In summary, you have a good foundation in Python and data manipulation libraries, but gaining hands-on experience with real-world projects and expanding your skill set in areas like data visualization and SQL will be crucial to reaching your goal of working as a data analyst.
-        """,
-    },
-    {
-        "input": """
-        "I’ve just started learning web development and have a basic understanding of HTML and CSS. I can create simple web pages with static content, but I’m struggling with more advanced layouts and responsive design. I want to specialize in front-end development and eventually build interactive, user-friendly websites. My goal is to become proficient in JavaScript and learn frameworks like React.
-        """,
-        "output": """
-        Your current grasp of HTML and CSS indicates that you’ve covered the essential building blocks of web development. Being able to create simple web pages with static content shows that you understand the basics of structuring a web page and applying styles. However, struggling with advanced layouts and responsive design is a common hurdle at this stage. Mastering responsive design, which involves using techniques like media queries and flexible grid systems, will be key to making your web pages adaptable across different devices and screen sizes.
-
-        Your interest in front-end development aligns perfectly with your desire to build interactive, user-friendly websites. Becoming proficient in JavaScript is the logical next step, as it allows you to add interactivity and dynamic behavior to your websites. JavaScript will open the door to creating more complex user interfaces, handling events, and manipulating the DOM (Document Object Model).
-
-        Your long-term goal of learning frameworks like React is well-suited to your career ambitions in front-end development. React is one of the most popular frameworks for building scalable and maintainable front-end applications, and it will enable you to create modular, component-based interfaces that are easier to manage and extend. Before diving into React, though, it’s important to solidify your understanding of core JavaScript concepts like functions, objects, arrays, and asynchronous programming (e.g., promises and async/await).
-
-        In summary, you have a solid start with HTML and CSS, and focusing on responsive design and JavaScript will be crucial steps toward your goal of becoming a front-end developer. Your path towards mastering frameworks like React will follow naturally as you build your confidence with JavaScript and deepen your front-end skills.
-        """,
-    },
-]
-
-few_shot_skillset = FewShotChatMessagePromptTemplate(
-    example_prompt=example_prompt,
-    examples=skillset_analysis_examples,
-)
-
-skillset_templ = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            """
-            Persona: You are an AI assistant specialized in career guidance and skill assessment. Your role is to evaluate the user's current skill set, knowledge on a specific topic, and end goal, providing a detailed analysis that includes elborative explanation of user's skills.
-
-            Task: Analyze the user’s input, which includes their current skill set, knowledge about a particular topic, and their end goal. Your output should include an assessment of the user’s skill and knowledge of all the technologies user knows and to what extent.
-
-            Format: The output should be plain text paragraphs without any markdowns or bullet points
-            """,
-        ),
-        few_shot_skillset,
-        ("human", "{input}"),
-    ]
-)
-
 
 # SkillGap Analysis
 
@@ -275,28 +207,20 @@ def convert_to_first_person(data):
 
 load_dotenv()
 
-parameters = {
-    GenParams.DECODING_METHOD: DecodingMethods.GREEDY,
-    GenParams.MIN_NEW_TOKENS: 1,
-    GenParams.MAX_NEW_TOKENS: 5000,
-}
+# parameters = {
+#     GenParams.DECODING_METHOD: DecodingMethods.GREEDY,
+#     GenParams.MIN_NEW_TOKENS: 1,
+#     GenParams.MAX_NEW_TOKENS: 5000,
+# }
 
 # chat = ChatWatsonx(
-#     model_id="ibm/granite-13b-chat-v2",
+#     model_id="meta-llama/llama-2-70b-chat",
 #     project_id="8306ea50-a0cc-4cad-bdd0-d6c2b30623b8",
 #     params=parameters,
 # )
 
 chat = AzureChatOpenAI(azure_deployment="gpt-4o", api_version="2023-03-15-preview")
 
-skillset_chain = (
-    skillset_templ
-    | chat
-    | StrOutputParser()
-    | RunnableLambda(lambda x: convert_to_first_person(x))
-    | chat
-    | StrOutputParser()
-)
 
 skillgap_chain = (
     skillgap_templ
@@ -311,10 +235,8 @@ roadmap_chain = roadmap_templ | chat | StrOutputParser()
 
 curr_skillset = "I've recently started exploring data science and have a basic understanding of Python. I can write simple scripts to manipulate data and have learned how to use Pandas for data cleaning and analysis. I also know some basic statistics, like mean, median, and standard deviation, and have worked with simple visualizations using Matplotlib. I’m interested in becoming a data scientist and want to learn more about machine learning and how to apply it to real-world problems. My goal is to build a strong foundation in data science and eventually work on projects involving predictive modeling and big data."
 
-skillset = skillset_chain.invoke({"input": curr_skillset})
-print("\n**************Skillset Analysis******************\n")
-print(skillset)
-skillgap = skillgap_chain.invoke({"input": skillset})
+
+skillgap = skillgap_chain.invoke({"input": curr_skillset})
 print("\n**************Skillgap Analysis******************\n")
 print(skillgap)
 roadmap = roadmap_chain.invoke({"input": skillgap})
