@@ -9,6 +9,7 @@ from langchain_core.prompts import (
     FewShotChatMessagePromptTemplate,
 )
 from langchain.schema.output_parser import StrOutputParser
+import json
 
 # Example for fewshot prompting
 
@@ -203,12 +204,6 @@ roadmap_templ = ChatPromptTemplate.from_messages(
 )
 
 
-# To convert from third person to first
-def convert_to_first_person(data):
-    pros_template = ChatPromptTemplate.from_template("Convert to first person: {data}")
-    return pros_template.format_prompt(data=data)
-
-
 # Defining the model
 
 load_dotenv()
@@ -225,21 +220,29 @@ chat = ChatWatsonx(
     params=parameters,
 )
 
-# chat = AzureChatOpenAI(azure_deployment="gpt-4o", api_version="2023-03-15-preview")
 
+def json_decode(json_str):
+    start_index = json_str.find("[")
+    end_index = json_str.rfind("]")
+
+    trimmed_json_str = json_str[start_index : end_index + 1]
+
+    try:
+        return json.loads(trimmed_json_str)
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+        return {}
+
+
+decoder = RunnableLambda(lambda x: json_decode(x))
 
 skillgap_chain = skillgap_templ | chat | StrOutputParser()
 
 
-roadmap_chain = roadmap_templ | chat | StrOutputParser()
-
-curr_skillset = "I've recently started exploring data science and have a basic understanding of Python. I can write simple scripts to manipulate data and have learned how to use Pandas for data cleaning and analysis. I also know some basic statistics, like mean, median, and standard deviation, and have worked with simple visualizations using Matplotlib. I’m interested in becoming a data scientist and want to learn more about machine learning and how to apply it to real-world problems. My goal is to build a strong foundation in data science and eventually work on projects involving predictive modeling and big data."
+roadmap_chain = roadmap_templ | chat | StrOutputParser() | decoder
 
 
-if __name__ == "__main__":
+def get_roadmaps(curr_skillset) -> dict:
     skillgap = skillgap_chain.invoke({"input": curr_skillset})
-    print("\n**************Skillgap Analysis******************\n")
-    print(skillgap)
     roadmap = roadmap_chain.invoke({"input": skillgap})
-    print("\n**************Roadmap******************\n")
-    print(roadmap)
+    return roadmap

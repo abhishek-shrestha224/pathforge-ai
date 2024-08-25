@@ -6,19 +6,37 @@
     <title>PathForge.ai::Roadmap</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
     />
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="w-screen overflow-x-hidden">
+  <body class="w-screen overflow-x-hidden bg-zinc-100">
     {% if roadmaps %}
     <section>
-      {% for roadmap in roadmaps %} {% for k, v in roadmap.items() %}
-      <div class="flex flex-col gap-2">
-        <h3 class="text-3xl">{{ k }}:</h3>
-        <p class="text-xl">{{ v }}</p>
+      <h1
+        class="mb-4 pl-80 mt-5 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl font-arkhip"
+      >
+        Your Roadmap:
+      </h1>
+      <div class="1-full py-8 px-80">
+        <ol class="relative border-s border-gray-900">
+          {% for roadmap in roadmaps %} {% for k, v in roadmap.items() %}
+          <li class="mb-10 ms-4">
+            <div
+              class="absolute w-3 h-3 rounded-full mt-1.5 -start-1.5 border border-gray-900 bg-gray-700"
+            ></div>
+            <h2 class="text-2xl font-bold font-arkhip text-gray-900">
+              {{ k }}
+            </h2>
+
+            <p class="text-base text-md text-justify font-normal text-gray-900">
+              {{ v }}
+            </p>
+          </li>
+          {% endfor %} {% endfor %}
+        </ol>
       </div>
-      {% endfor %} {% endfor %}
     </section>
     {% endif %}
   </body>
