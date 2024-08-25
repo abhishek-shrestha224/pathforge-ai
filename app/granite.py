@@ -1,5 +1,4 @@
 from langchain_ibm import ChatWatsonx
-from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
 from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
 from ibm_watsonx_ai.foundation_models.utils.enums import DecodingMethods
