@@ -72,11 +72,11 @@ skillgap_templ = ChatPromptTemplate.from_messages(
         (
             "system",
             """
-            Persona: You are an AI assistant specialized in career guidance and skill assessment. Your role is to evaluate the user's current skill set, knowledge on a specific topic, and end goal, providing a detailed analysis that includes elborative explanation of user's skills.
+            Persona: You are an AI assistant specialized in career guidance and skill assessment.
 
-            Task: Analyze the user’s input, which includes their current skill set, knowledge about a particular topic, and their end goal. Your output should include an assessment of the user’s skill and knowledge of all the technologies user knows and to what extent.
+            Task: Analyze the user’s input, which includes their current skill set, knowledge about a particular topic, and their end goal. Identify key areas where the user needs to improve to reach their end goal. Focus on the most critical skill gaps and keep the output concise for website display, using the third person.
 
-            Format: The output should be plain text paragraphs without any markdowns or bullet points
+            Format: The output should be 2-3 sentences in plain text without any markdowns or bullet points
             """,
         ),
         few_shot_skillgap,
@@ -179,16 +179,22 @@ few_shot_roadmap = FewShotChatMessagePromptTemplate(
     examples=roadmap_examples,
 )
 
+# Modified roadmap_chain to output data suitable for graph visualization
 roadmap_templ = ChatPromptTemplate.from_messages(
     [
         (
             "system",
             """
-            Persona: You are an AI assistant specialized in career guidance and skill assessment. Your role is to evaluate the user's current skill set, knowledge on a specific topic, and end goal, providing a detailed analysis that includes elborative explanation of user's skills.
+            Persona: You are an AI assistant specialized in career guidance and skill assessment. Your role is to evaluate the user's current skill set, knowledge on a specific topic, and end goal, providing a detailed analysis.
 
-            Task: Analyze the user’s input, which includes their current skill set, knowledge about a particular topic, and their end goal along with skill gap analysis between end goal and current position. Your output should include a roadmap that the user can follow to achieve his goals given where he is now. This roadmap should be in depth covering every tools and technology that the user might need to learn to achieve his goal.
+            Task: Analyze the user’s input, which includes their current skill set, knowledge about a particular topic, and their end goal along with skill gap analysis between the end goal and current position.
 
-            Format: The output should be json array  where the object is the tool user should know and the value is the explanation of what that tools is and why is it used. dont make any points just paragraphs.
+            Your output should be a JSON array where each object represents a step in the roadmap, focusing on a clear step-wise progression. Each object should have the following keys:
+
+            * "step": The numerical step in the roadmap
+            * "skill": The name of the skill or technology to be learned in this step
+            * "description": A brief description of the skill and its relevance to the end goal
+            * "resources": (Optional) An array of recommended learning resources for this skill (e.g., online courses, books, projects)
             """,
         ),
         few_shot_roadmap,
@@ -207,38 +213,33 @@ def convert_to_first_person(data):
 
 load_dotenv()
 
-# parameters = {
-#     GenParams.DECODING_METHOD: DecodingMethods.GREEDY,
-#     GenParams.MIN_NEW_TOKENS: 1,
-#     GenParams.MAX_NEW_TOKENS: 5000,
-# }
+parameters = {
+    GenParams.DECODING_METHOD: DecodingMethods.GREEDY,
+    GenParams.MIN_NEW_TOKENS: 1,
+    GenParams.MAX_NEW_TOKENS: 8000,
+}
 
-# chat = ChatWatsonx(
-#     model_id="meta-llama/llama-2-70b-chat",
-#     project_id="8306ea50-a0cc-4cad-bdd0-d6c2b30623b8",
-#     params=parameters,
-# )
-
-chat = AzureChatOpenAI(azure_deployment="gpt-4o", api_version="2023-03-15-preview")
-
-
-skillgap_chain = (
-    skillgap_templ
-    | chat
-    | StrOutputParser()
-    | RunnableLambda(lambda x: convert_to_first_person(x))
-    | chat
-    | StrOutputParser()
+chat = ChatWatsonx(
+    model_id="ibm/granite-13b-chat-v2",
+    project_id="8306ea50-a0cc-4cad-bdd0-d6c2b30623b8",
+    params=parameters,
 )
+
+# chat = AzureChatOpenAI(azure_deployment="gpt-4o", api_version="2023-03-15-preview")
+
+
+skillgap_chain = skillgap_templ | chat | StrOutputParser()
+
 
 roadmap_chain = roadmap_templ | chat | StrOutputParser()
 
 curr_skillset = "I've recently started exploring data science and have a basic understanding of Python. I can write simple scripts to manipulate data and have learned how to use Pandas for data cleaning and analysis. I also know some basic statistics, like mean, median, and standard deviation, and have worked with simple visualizations using Matplotlib. I’m interested in becoming a data scientist and want to learn more about machine learning and how to apply it to real-world problems. My goal is to build a strong foundation in data science and eventually work on projects involving predictive modeling and big data."
 
 
-skillgap = skillgap_chain.invoke({"input": curr_skillset})
-print("\n**************Skillgap Analysis******************\n")
-print(skillgap)
-roadmap = roadmap_chain.invoke({"input": skillgap})
-print("\n**************Roadmap******************\n")
-print(roadmap)
+if __name__ == "__main__":
+    skillgap = skillgap_chain.invoke({"input": curr_skillset})
+    print("\n**************Skillgap Analysis******************\n")
+    print(skillgap)
+    roadmap = roadmap_chain.invoke({"input": skillgap})
+    print("\n**************Roadmap******************\n")
+    print(roadmap)
