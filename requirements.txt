@@ -33,6 +33,7 @@ langchain==0.2.14
 langchain-community==0.2.12
 langchain-core==0.2.34
 langchain-ibm==0.1.12
+langchain-openai==0.1.22
 langchain-text-splitters==0.2.2
 langsmith==0.1.104
 lomond==0.3.3
